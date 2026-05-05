@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Happy Birthday!</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      overflow: hidden;
+      background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      text-align: center;
+      color: white;
+      padding: 20px;
+    }
+
+    .container {
+      z-index: 2;
+      max-width: 500px;
+      width: 100%;
+      padding: 30px 20px;
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 20px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    }
+
+    h1 {
+      font-size: clamp(2rem, 8vw, 4rem);
+      margin-bottom: 15px;
+    }
+
+    p {
+      font-size: clamp(1rem, 4vw, 1.4rem);
+      margin-bottom: 20px;
+      line-height: 1.5;
+    }
+
+    button {
+      padding: 12px 25px;
+      font-size: 1rem;
+      border: none;
+      border-radius: 30px;
+      background: white;
+      color: #ff4e50;
+      cursor: pointer;
+      transition: 0.3s;
+      font-weight: bold;
+    }
+
+    button:hover {
+      background: #ffe3e3;
+      transform: scale(1.05);
+    }
+
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    @media (max-width: 480px) {
+      .container {
+        padding: 25px 15px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<canvas id="confetti"></canvas>
+
+<div class="container">
+  <h1>🎉 Happy Birthday! 🎂</h1>
+  <p>Wishing you a day filled with love, laughter, and endless happiness. May all your dreams come true!</p>
+  <button onclick="launchConfetti()">Celebrate 🎊</button>
+</div>
+
+<script>
+  const canvas = document.getElementById("confetti");
+  const ctx = canvas.getContext("2d");
+
+  let W = window.innerWidth;
+  let H = window.innerHeight;
+  canvas.width = W;
+  canvas.height = H;
+
+  const particles = [];
+  const colors = ["#ff0a54", "#ff477e", "#ff7096", "#ff85a1", "#fbb1bd", "#f9bec7"];
+
+  function random(min, max) {
+    return Math.random() * (max - min) + min;
+  }
+
+  class Confetti {
+    constructor() {
+      this.x = random(0, W);
+      this.y = random(-H, 0);
+      this.r = random(4, 8);
+      this.d = random(10, 30);
+      this.color = colors[Math.floor(Math.random() * colors.length)];
+      this.tilt = random(-10, 10);
+      this.tiltAngle = 0;
+      this.tiltAngleIncrement = random(0.05, 0.12);
+    }
+
+    draw() {
+      ctx.beginPath();
+      ctx.lineWidth = this.r;
+      ctx.strokeStyle = this.color;
+      ctx.moveTo(this.x + this.tilt + this.r / 2, this.y);
+      ctx.lineTo(this.x + this.tilt, this.y + this.tilt + this.r / 2);
+      ctx.stroke();
+    }
+
+    update() {
+      this.y += (Math.cos(this.d) + 3 + this.r / 2) / 2;
+      this.tiltAngle += this.tiltAngleIncrement;
+      this.tilt = Math.sin(this.tiltAngle) * 15;
+
+      if (this.y > H) {
+        this.x = random(0, W);
+        this.y = -20;
+      }
+    }
+  }
+
+  function initConfetti() {
+    particles.length = 0;
+    for (let i = 0; i < 150; i++) {
+      particles.push(new Confetti());
+    }
+  }
+
+  function drawConfetti() {
+    ctx.clearRect(0, 0, W, H);
+    particles.forEach((p) => {
+      p.update();
+      p.draw();
+    });
+    requestAnimationFrame(drawConfetti);
+  }
+
+  function launchConfetti() {
+    initConfetti();
+  }
+
+  window.addEventListener("resize", () => {
+    W = window.innerWidth;
+    H = window.innerHeight;
+    canvas.width = W;
+    canvas.height = H;
+  });
+
+  initConfetti();
+  drawConfetti();
+</script>
+
+</body>
+</html>
